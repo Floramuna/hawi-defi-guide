@@ -1,8 +1,15 @@
 
 import { Button } from "@/components/ui/button";
 import { Brain, Cpu, Shield, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
+  const handleStartLearning = () => {
+    navigate("/login");
+  };
+
   return (
     <section className="min-h-screen bg-gradient-to-br from-royal-purple via-deep-blue to-sky-blue relative overflow-hidden">
       {/* Background Pattern */}
@@ -57,6 +64,7 @@ const HeroSection = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-8">
             <Button 
+              onClick={handleStartLearning}
               size="lg" 
               className="bg-gold text-black hover:bg-gold-light font-semibold px-8 py-4 text-lg rounded-xl transition-all duration-300 transform hover:scale-105"
             >
