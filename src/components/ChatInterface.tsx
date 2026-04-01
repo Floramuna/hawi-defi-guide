@@ -1,145 +1,103 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import ChatMessage from "@/components/ChatMessage";
-import { useLLMCanister } from "@/hooks/useLLMCanister";
+import { hawiBackend } from "@/services/hawiBackend";
 import { toast } from "sonner";
 
-interface Message {
-  id: string;
+type Message = {
+  sender: "user" | "bot";
   text: string;
-  isUser: boolean;
+  id: string;
   timestamp: Date;
-}
+};
 
 const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
-      text: "Hello! I'm HAWI-AI, your DeFi learning companion powered by Internet Computer's LLM canister. I'm here to help you understand decentralized finance concepts, from basic terms to advanced strategies. What would you like to learn about today?",
-      isUser: false,
+      id: "welcome",
+      sender: "bot",
+      text: "Hello! I'm HAWI-AI, your DeFi learning companion powered by Internet Computer. Ask me anything about decentralized finance!",
       timestamp: new Date(),
     },
   ]);
-  const [inputValue, setInputValue] = useState("");
-  
-  const { isInitialized, isLoading, error, generateResponse, getChatHistory } = useLLMCanister();
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (error) {
-      toast.error(`LLM Canister Error: ${error}`);
-    }
-  }, [error]);
+  const sendMessage = async () => {
+    if (!input.trim()) return;
 
-  useEffect(() => {
-    if (isInitialized) {
-      toast.success("Connected to LLM Canister successfully!");
-      loadChatHistory();
-    }
-  }, [isInitialized]);
-
-  const loadChatHistory = async () => {
-    try {
-      const history = await getChatHistory();
-      if (history.length > 0) {
-        const historyMessages: Message[] = [];
-        
-        history.forEach((item, index) => {
-          // Add user message
-          historyMessages.push({
-            id: `history-user-${index}`,
-            text: item.prompt,
-            isUser: true,
-            timestamp: new Date(Number(item.timestamp) / 1000000), // Convert nanoseconds to milliseconds
-          });
-          
-          // Add AI response
-          historyMessages.push({
-            id: `history-ai-${index}`,
-            text: item.response,
-            isUser: false,
-            timestamp: new Date(Number(item.timestamp) / 1000000),
-          });
-        });
-        
-        setMessages(prev => [...prev, ...historyMessages]);
-      }
-    } catch (error) {
-      console.error("Failed to load chat history:", error);
-    }
-  };
-
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
-    
-    if (!isInitialized) {
-      toast.error("LLM canister not initialized. Please wait or refresh the page.");
-      return;
-    }
-
-    const newUserMessage: Message = {
+    const userMessage: Message = {
       id: Date.now().toString(),
-      text: inputValue,
-      isUser: true,
+      sender: "user",
+      text: input,
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, newUserMessage]);
-    const currentInput = inputValue;
-    setInputValue("");
+    setMessages((prev) => [...prev, userMessage]);
+    const currentInput = input;
+    setInput("");
+    setLoading(true);
 
     try {
-      // Generate AI response using the LLM canister
-      const aiResponseText = await generateResponse(currentInput);
-      
-      const aiResponse: Message = {
+      const response = await hawiBackend.askQuestion(currentInput);
+
+      const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: aiResponseText,
-        isUser: false,
+        sender: "bot",
+        text: response,
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, aiResponse]);
+
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Error generating response:", error);
-      
-      const errorResponse: Message = {
+      console.error(error);
+
+      const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I apologize, but I'm having trouble connecting to the AI service right now. Please try again in a moment.",
-        isUser: false,
+        sender: "bot",
+        text: "Error connecting to backend. Please try again.",
         timestamp: new Date(),
       };
-      
-      setMessages(prev => [...prev, errorResponse]);
-      toast.error("Failed to generate AI response. Please try again.");
+
+      setMessages((prev) => [...prev, errorMessage]);
+      toast.error("Failed to get AI response");
     }
+
+    setLoading(false);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      sendMessage();
     }
   };
 
   return (
     <div className="h-full flex flex-col bg-background">
-      {/* Chat Messages */}
       <ScrollArea className="flex-1 p-6">
         <div className="space-y-6 max-w-4xl mx-auto">
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
+          {messages.map((msg) => (
+            <ChatMessage
+              key={msg.id}
+              message={{
+                id: msg.id,
+                text: msg.text,
+                isUser: msg.sender === "user",
+                timestamp: msg.timestamp,
+              }}
+            />
           ))}
-          {isLoading && (
+          {loading && (
             <div className="flex justify-start">
               <div className="bg-card border border-border rounded-lg p-4 max-w-[70%]">
                 <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-gradient-primary rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-gradient-primary rounded-full animate-pulse delay-75"></div>
-                  <div className="w-2 h-2 bg-gradient-primary rounded-full animate-pulse delay-150"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-75"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-pulse delay-150"></div>
                   <span className="text-sm text-muted-foreground ml-2">AI is thinking...</span>
                 </div>
               </div>
@@ -148,32 +106,27 @@ const ChatInterface = () => {
         </div>
       </ScrollArea>
 
-      {/* Input Area */}
       <div className="border-t border-border p-6 bg-card/50 backdrop-blur">
         <div className="max-w-4xl mx-auto">
           <div className="flex space-x-4">
             <Input
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder={isInitialized ? "Ask me anything about DeFi..." : "Connecting to LLM canister..."}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Ask HAWI-AI about DeFi..."
               className="flex-1"
-              disabled={!isInitialized || isLoading}
+              disabled={loading}
             />
-            <Button 
-              onClick={handleSendMessage}
-              disabled={!inputValue.trim() || !isInitialized || isLoading}
-              className="bg-gradient-primary text-white"
+            <Button
+              onClick={sendMessage}
+              disabled={!input.trim() || loading}
+              className="bg-primary text-primary-foreground"
             >
               <Send className="w-4 h-4" />
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2 text-center">
-            {isInitialized ? (
-              <>Powered by Internet Computer LLM Canisters • Privacy-first AI</>
-            ) : (
-              <>Connecting to LLM canister...</>
-            )}
+            Powered by Internet Computer • Privacy-first AI
           </p>
         </div>
       </div>
