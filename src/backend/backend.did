@@ -1,0 +1,51 @@
+type Message = record {
+    role : text;
+    content : text;
+    timestamp : int;
+};
+
+type ChatSession = record {
+    id : text;
+    userId : principal;
+    title : text;
+    messages : vec Message;
+    createdAt : int;
+    updatedAt : int;
+};
+
+type AIResponse = record {
+    content : text;
+    error : opt text;
+    success : bool;
+};
+
+type Config = record {
+    maxTokens : nat64;
+    temperature : float64;
+    model : text;
+};
+
+type Error = variant {
+    NotFound;
+    Unauthorized;
+    InvalidInput;
+    LLMError : text;
+};
+
+type Result = variant {
+    ok : ChatSession;
+    err : Error;
+};
+
+service : {
+    createChatSession : (title: text) -> (Result);
+    getChatSessions : () -> (vec ChatSession) query;
+    getChatSession : (sessionId: text) -> (Result) query;
+    addMessage : (sessionId: text, content: text, role: text) -> (Result);
+    sendToLLM : (sessionId: text, userMessage: text) -> (Result_1);
+    getConfig : () -> (Config) query;
+    deleteChatSession : (sessionId: text) -> (Result_2);
+    ping : () -> (text) query;
+    health : () -> (text) query;
+    getCanisterInfo : () -> (record { name : text; version : text; sessions : nat }) query;
+}

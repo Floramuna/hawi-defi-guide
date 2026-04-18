@@ -1,0 +1,56 @@
+// LLM Canister Interface Definition
+type Config = record {
+    max_tokens : nat64;
+    temperature : float64;
+    top_p : opt float64;
+    frequency_penalty : opt float64;
+    presence_penalty : opt float64;
+    stop : opt text;
+};
+
+type Response = record {
+    text : text;
+    usage : record {
+        prompt_tokens : nat64;
+        completion_tokens : nat64;
+        total_tokens : nat64;
+    };
+    finish_reason : text;
+};
+
+type StreamResponse = record {
+    text : text;
+    finished : bool;
+};
+
+type Embedding = record {
+    embedding : vec float64;
+    usage : record {
+        prompt_tokens : nat64;
+        total_tokens : nat64;
+    };
+};
+
+type ModelInfo = record {
+    name : text;
+    max_context_length : nat64;
+    supports_streaming : bool;
+    supports_embeddings : bool;
+};
+
+service : {
+    // Simple chat completion
+    chat : (text, opt Config) -> (Response);
+    
+    // Stream chat completion
+    stream : (text, opt Config) -> (StreamResponse);
+    
+    // Generate embeddings for text
+    embed : (text) -> (Embedding);
+    
+    // Get information about the loaded model
+    get_model_info : () -> (ModelInfo) query;
+    
+    // Check if the canister is ready
+    health_check : () -> (text) query;
+}

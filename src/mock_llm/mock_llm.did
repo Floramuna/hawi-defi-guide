@@ -1,0 +1,57 @@
+cat > src/mock_llm/mock_llm.did << 'EOF'
+type Config = record {
+    max_tokens : nat64;
+    temperature : float64;
+    top_p : opt float64;
+    frequency_penalty : opt float64;
+    presence_penalty : opt float64;
+    stop : opt text;
+};
+
+type Response = record {
+    text : text;
+    usage : record {
+        prompt_tokens : nat64;
+        completion_tokens : nat64;
+        total_tokens : nat64;
+    };
+    finish_reason : text;
+};
+
+type StreamResponse = record {
+    text : text;
+    finished : bool;
+};
+
+type Embedding = record {
+    embedding : vec float64;
+    usage : record {
+        prompt_tokens : nat64;
+        total_tokens : nat64;
+    };
+};
+
+type ModelInfo = record {
+    name : text;
+    max_context_length : nat64;
+    supports_streaming : bool;
+    supports_embeddings : bool;
+    version : text;
+};
+
+type Stats = record {
+    total_calls : nat;
+    last_response_time : int;
+    model_name : text;
+};
+
+service : {
+    chat : (text, opt Config) -> (Response);
+    stream : (text, opt Config) -> (StreamResponse);
+    embed : (text) -> (Embedding);
+    get_model_info : () -> (ModelInfo) query;
+    health_check : () -> (text) query;
+    get_stats : () -> (Stats) query;
+    reset : () -> ();
+}
+EOF

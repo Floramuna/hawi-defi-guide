@@ -1,73 +1,138 @@
-# Welcome to your Lovable project
+HAWI-AI
 
-## Project info
+Decentralized AI Knowledge Companion for DeFi — Built on the Internet Computer
 
-**URL**: https://lovable.dev/projects/8c1c647d-0e53-43be-b009-ae033d021d94
+Overview
+HAWI-AI is a decentralized AI-powered assistant designed to help users understand Decentralized Finance (DeFi) in a simple, secure, and interactive way.
+The platform uses AI running on the Internet Computer (ICP) to provide users with explanations, learning guidance, and insights about DeFi without relying on external APIs.
+Unlike traditional AI assistants, HAWI-AI runs fully on-chain, ensuring privacy, transparency, and decentralization.
 
-## How can I edit this code?
+Problem
+The DeFi ecosystem is growing rapidly, but many users face major challenges:
+Lack of clear educational resources
+Complex technical terminology
+High risk of scams and misinformation
+Limited AI tools that respect user privacy
 
-There are several ways of editing your application.
+Most AI tools rely on centralized APIs, which introduces issues like:
+Data privacy concerns
+API costs
+Dependence on centralized providers
 
-**Use Lovable**
+Solution
+HAWI-AI solves these problems by providing:
+A decentralized AI assistant
+DeFi education through interactive chat
+On-chain AI inference using Internet Computer canisters
+No external APIs
+Private and secure user interaction
+Users can ask questions about DeFi and receive intelligent responses directly from the blockchain.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/8c1c647d-0e53-43be-b009-ae033d021d94) and start prompting.
+Key Features
+AI Chat Interface
+Ask questions about DeFi concepts, protocols, and blockchain topics.
+Fully On-Chain AI
+Uses LLM canisters on the Internet Computer instead of external APIs.
+Decentralized Architecture
+All backend logic runs in Motoko smart contracts (canisters).
+Interactive UI
+Modern interface built with React, TypeScript, and TailwindCSS.
+Secure & Private
+No centralized servers handling AI requests.
 
-Changes made via Lovable will be committed automatically to this repo.
+Architecture
+HAWI-AI follows a three-layer architecture:
+Frontend (React + Vite + Tailwind)
+        ↓
+Backend Canister (Motoko)
+        ↓
+LLM Canister (On-chain AI)
 
-**Use your preferred IDE**
+Components
+Frontend
+React
+TypeScript
+TailwindCSS
+Vite
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Backend
+Motoko smart contract
+Handles user input
+Communicates with AI logic
+AI Layer
+LLM Canister
+Generates responses for user queries
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Project Structure
+HAWI-AI
+│
+├── src
+│   ├── backend
+│   │   ├── main.mo
+│   │   └── types.mo
+│   │
+│   └── frontend
+│       ├── src
+│       ├── components
+│       ├── pages
+│       └── vite.config.ts
+│
+├── dfx.json
+├── vessel.dhall
+└── README.md
 
-Follow these steps:
+Technology Stack
+Blockchain
+Internet Computer (ICP)
+Canisters
+Backend
+Motoko
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Frontend
+React
+TypeScript
+Vite
+TailwindCSS
+shadcn UI
+Development Tools
+DFX SDK
+Node.js
+npm
+Git
+WSL
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Installation & Setup
+1. Clone the repository
+git clone https://github.com/Floramuna/HAWI-AI.git
+cd HAWI-AI
+2. Start the Internet Computer local replica
+dfx start --clean --background
+3. Build the frontend
+cd src/frontend
+npm install
+npm run build
+4. Deploy the canisters
+cd ../../
+dfx deploy
+5. Open the application
 
-# Step 3: Install the necessary dependencies.
-npm i
+DFX will provide a URL like:
+http://<frontend-canister-id>.localhost:4943
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Open it in your browser.
+Future Improvements
 
-**Edit a file directly in GitHub**
+Planned features for HAWI-AI include:
+Wallet integration
+DeFi risk analysis
+Smart portfolio insights
+AI-powered investment education
+Real-time DeFi analytics
+Multi-language support
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Author
+Muna (Flora Muna)
+Computer Science Student – Kiriri Women’s University
 
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/8c1c647d-0e53-43be-b009-ae033d021d94) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+GitHub:
+https://github.com/Floramuna
